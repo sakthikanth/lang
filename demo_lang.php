@@ -5,26 +5,34 @@
 	    <meta http-equiv="Content-Type" content="text/html; charset=utf8"  />
 
 	<script type="text/javascript" src="./jquery.min.js"></script>
-	<script src="./fabric.js"></script>
+	<?php
+		$fix  = isset($_GET['lang']) && $_GET['lang'];
+		$file = $fix ? "fabric" : "fabric_cur";
+	 ?>
+	<script src="./<?=$file?>.js"></script>
 	<style type="text/css">
 		
-	
 	</style>
 </head>
 <body>
-	<div id="out"></div>
-	<textarea id="textcont"></textarea>
-	<div>
-		Test
+<div class="container">
+
+	<?php
+	$title = $fix ? "Fixed Method" : "Current Version"
+	 ?>
+	<div class="cur_version">
+		<h1>Fabric JS</h1>
+		<h1><?=$title?></h1>
+		<h2>Character Spacing</h2>
+		<span>
+			<input type="range" onchange="s.change_char_spacing(this.value)" id="char_spacing" min="0" max="1000" step="100">	
+		</span>
+		
+		<canvas id="canva"></canvas>
 	</div>
-	<div id="out2"></div>
-	<textarea id="textcont2"></textarea>
 
-		<div>
-			<canvas id="myCanvas"></canvas>
-			<canvas id="fabric_canvas" width="1000"></canvas>
-		</div>
 
+</div>
 <script type="text/javascript">
 	
 
@@ -39,78 +47,71 @@
 	 let smileys = "❀ヅ❤♫";
 	 // tamil2 = "உலகளாவிய ரீதியில்";
 	 let len = {'tamil' : 494,'tamil2':401,'hindi':525,'malayalam':0};
-	 let chars,cnt = 0;
-	 let iteration = 4;
-	 let text = hindi;// "रू";//"வசனத்தைச் சேர";
+	 
+	 let text = tamil;// //"வசனத்தைச் சேர";
+	 
+	 var canvas = new fabric.Canvas('canva');
+	 
+	 var s = {
+	 	left : 10,
+	 	top : 0,
+	 	canva_width : 500,
+	 	canva_height : 200,
+	 	diff_canva : {0:{top:10,left:10},1:{top:10,left:10}},
+	 	add_text : function(text) {
+	 		this.top += 50;  
+			var newText= new fabric.IText( text , {
+			  fontWeight:200,
+			  fontSize:30,
+			  charSpacing:700,
+			  top : s.top,
+			  fill:"rgb(0,0,0)",
+			});
+			
+			canvas.add(newText);
+	 	},
+	 	init_dimension	: function(){
+
+	 		canvas.setWidth(this.canva_width);
+	 		canvas.setHeight(this.canva_height);
+	 	},
+	 	init : function () {
+	 		s.init_dimension();
+	 		s.add_text('தமிழ்');
+			s.add_text('English');		
+	 		s.add_text('हिंदी');		
+	 		
+	 	},
+	 	change_char_spacing : function (char_spacing) {
+	 		canvas._objects.forEach(function (item) {
+	 			item.charSpacing = char_spacing;
+	 			canvas.renderAll();
+	 		});
+	 	},
+	 	dom_actions : function(){
+ 			let count_out = 0,count = 0;
+			$('#textcont2').val(chars.toString());
+			let test2 = chars;
+			$('#textcont').keydown(function () {
+			 	if($(this).val() != ''){
+			 		count++;
+			 		$('#out').text("Count : "+count);
+			 		test2.shift();
+					$('#textcont2').val(test2.toString());	 		
+			 	}
+			});
+
+			$('#textcont2').keydown(function () {
+			 	if($(this).val() != ''){
+			 		count_out++;
+			 		$('#out2').text("Count : "+count_out);
+			 	}
+			});
+	 	}
+
+	 };
+	 s.init();
 	
-	 $('#textcont').val(text);
-  function languageCharacters(textstring) {
-    let char_config = {iteration : 4, max_diff : 1.5, fontsize : "10px", fontfamily : 'Arial', letterSpacing : "15px" };
-    let n = 0,max,next,with_next,char1,char2,char3,start,end,char,i,chars = [],text = textstring;
-    let canva = fabric.document.getElementById('fabric_canva'),
-      c = canva != null ? canva : fabric.document.createElement("canvas");
-    c.style.letterSpacing = char_config.letterSpacing;
-    c.style.display = 'none';
-    if(!canva){
-      c.id = "fabric_canva";
-      fabric.document.body.appendChild(c);
-    }
-    let ctx = c.getContext("2d");
-    ctx.font = char_config.fontsize+" "+char_config.fontfamily;
-    while(n < char_config.iteration){
-      chars = [];
-      for( i = 0,max = text.length ;i < max;i++){
-        next = (typeof text[i+1] == 'undefined') ? "" : text[i+1];
-        with_next = (text[i] + next);
-        char1 = (ctx.measureText(text[i]).width);
-        char2 = (ctx.measureText(next).width);
-        char3 = (ctx.measureText(with_next).width);
-        start = i;
-        i += ( Math.abs(char3 - (char1+char2) ) >= char_config.max_diff ) ? 1 : 0;
-        end = i;
-        char = start == end ? text[i] : with_next;
-        if(char.length)
-          chars.push(char);
-      } 
-      text = chars;
-      n++;
-    }
-    return chars;
-  }
-
-  	chars = languageCharacters(text);
-	let count_out = 0,count = 0;
-	$('#textcont2').val(chars.toString());
-	let test2 = chars;
-	$('#textcont').keydown(function () {
-	 	if($(this).val() != ''){
-	 		count++;
-	 		$('#out').text("Count : "+count);
-	 		test2.shift();
-			$('#textcont2').val(test2.toString());	 		
-	 	}
-	 });
-
-	 $('#textcont2').keydown(function () {
-	 	if($(this).val() != ''){
-	 		count_out++;
-	 		$('#out2').text("Count : "+count_out);
-	 	}
-	 });
-
-
-	 console.log(chars);
-
-	 var canvas  = new fabric.Canvas('fabric_canvas');
-
-var newText= new fabric.IText('தமிழ் மொழி', {
-  fontWeight:200,
-  fontSize:30,
-  charSpacing:700,
-  fill:"rgb(0,0,0)"
-});
-canvas.add(newText);
-	 // $('#out').html(out);
 </script>
 </body>
 </html>

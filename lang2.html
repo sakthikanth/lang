@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=utf8"  />
+
+	<title></title>
+</head>
+<style type="text/css">
+	canvas{
+		font-family: 'test';
+		background: whitesmoke;
+		/*width: 300px;*/
+		width: 300px;
+	}
+	
+</style>
+<body>
+	<div>
+		<canvas id="myCanvas"></canvas>
+		<canvas id="myCanvas2"></canvas>
+	</div>
+	<button onclick="copy()">copy</button>
+	<script>
+			let text = "உல";
+			let i = 0;
+			let with_next = text[i]+text[i+1];
+			
+			var c = document.getElementById("myCanvas");
+			c.style.letterSpacing = '16px';
+			
+			var ctx = c.getContext("2d");
+			ctx.font = "15px Arial";
+			let char_let = (ctx.measureText(text[i]).width);
+			ctx.fillText(text[i], 0, 100);
+			ctx.fillText(text[i+1], char_let, 100);
+	
+			let img_data = ctx.getImageData(0,0,c.width,c.height);
+
+
+			var c2 = document.getElementById("myCanvas2");
+			c2.style.letterSpacing = '16px';
+			
+			var ctx2 = c2.getContext("2d");
+			ctx2.font = "15px Arial";
+			ctx2.fillText(with_next, 0, 100);
+	
+			
+			let img_data2 = ctx2.getImageData(0,0,c2.width,c2.height);
+
+			let d1 = c.toDataURL();
+			let d2 = c2.toDataURL();
+
+			
+
+
+		 	var c = document.getElementById("myCanvas");
+		 	c.style.letterSpacing = "10px";
+			var ctx = c.getContext("2d");
+			ctx.font = "10px Arial";
+			// ctx.font = "50px Consolas";
+			var char1 = (ctx.measureText(text[i]).width);
+			var char2 = (ctx.measureText(text[i+1]).width);
+			var char3 = (ctx.measureText(with_next).width);
+			console.log(with_next,text[i]+" "+text[i+1]);
+			console.log('diff',Math.abs(char3 - (char1+char2)))
+			console.log(char3,char1+char2);
+
+
+
+function copy(argument) {
+	ctx.clearRect(0, 0, c.width, c.height);
+
+}
+
+
+
+function toUnicode(theString) {
+  var unicodeString = '';
+  for (var i=0; i < theString.length; i++) {
+    var theUnicode = theString.charCodeAt(i).toString(16).toUpperCase();
+    while (theUnicode.length < 4) {
+      theUnicode = '0' + theUnicode;
+    }
+    theUnicode = '\\u' + theUnicode;
+    unicodeString += theUnicode;
+  }
+  return unicodeString;
+}
+
+	</script>
+</body>
+</html>
